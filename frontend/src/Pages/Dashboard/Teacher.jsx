@@ -513,6 +513,8 @@ function Teacher() {
                       scheduleAt,
                     } = schedule;
 
+                    if (!studentInfo.studentId) return null;
+
                     const {
                       _id: studentId,
                       name,

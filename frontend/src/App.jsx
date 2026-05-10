@@ -14,6 +14,8 @@ import ApproveStudent from "./Pages/ApproveStudent";
 import NotFound from "./Pages/NotFound";
 import TodayDate from "./components/UI/TodayDate";
 import Spinner from "./components/UI/Spinner";
+import "./App.css"
+
 function App() {
   return (
     <>

@@ -30,7 +30,6 @@ function Admin() {
   const [spinner, setSpinner] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // ================= FETCH TEACHERS =================
 
   const fetchTeachers = async () => {
     try {
