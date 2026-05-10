@@ -14,6 +14,7 @@ import {
   FaChalkboardTeacher,
   FaUniversity,
   FaEnvelope,
+  FaUserGraduate,
 } from "react-icons/fa";
 
 import Header from "../../components/Header";
@@ -24,13 +25,14 @@ function Admin() {
 
   const [teachers, setTeachers] = useState([]);
   const [students, setStudents] = useState([]);
+  const [allStudents, setAllStudents] = useState([]);
 
   const [spinner, setSpinner] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // ---------------- FETCH TEACHERS ----------------
+  // ================= FETCH TEACHERS =================
 
-  const fetchData = async () => {
+  const fetchTeachers = async () => {
     try {
       const jwtToken = localStorage.getItem("jwtToken");
 
@@ -49,38 +51,58 @@ function Admin() {
         setTeachers(response.data.data.users);
       }
     } catch (error) {
-      console.error("Error fetching data:", error);
+      console.error("Error fetching teachers:", error);
+    }
+  };
+
+  // ================= FETCH PENDING STUDENTS =================
+
+  const fetchPendingStudents = async () => {
+    try {
+      const response = await axios.get(
+        `http://localhost:5000/api/v1/teachers`,
+        {
+          params: {
+            admissionStatus: false,
+          },
+        }
+      );
+
+      setStudents(response.data.students);
+    } catch (error) {
+      console.error("Error fetching pending students:", error);
+    }
+  };
+
+  // ================= FETCH ALL STUDENTS =================
+
+  const fetchAllStudents = async () => {
+    try {
+      const jwtToken = localStorage.getItem("jwtToken");
+
+      const response = await axios.get(
+        `http://localhost:5000/api/v1/admin/getstudents`,
+        {
+          headers: {
+            Authorization: `Bearer ${jwtToken}`,
+          },
+        }
+      );
+      console.log(response.data.data.users);
+
+      setAllStudents(response.data.data.users);
+    } catch (error) {
+      console.error("Error fetching all students:", error);
     }
   };
 
   useEffect(() => {
-    fetchData();
+    fetchTeachers();
+    fetchPendingStudents();
+    fetchAllStudents();
   }, []);
 
-  // ---------------- FETCH STUDENTS ----------------
-
-  useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        const response = await axios.get(
-          `http://localhost:5000/api/v1/teachers`,
-          {
-            params: {
-              admissionStatus: false,
-            },
-          }
-        );
-
-        setStudents(response.data.students);
-      } catch (error) {
-        console.error("Error fetching students data:", error);
-      }
-    };
-
-    fetchStudents();
-  }, []);
-
-  // ---------------- DELETE TEACHER ----------------
+  // ================= DELETE TEACHER =================
 
   const handleDeleteTeacher = async (_id, index) => {
     const jwtToken = localStorage.getItem("jwtToken");
@@ -105,7 +127,34 @@ function Admin() {
       });
   };
 
-  // ---------------- FORM ----------------
+  // ================= DELETE STUDENT =================
+
+  const handleDeleteStudent = async (_id, index) => {
+    const jwtToken = localStorage.getItem("jwtToken");
+
+    try {
+      await axios.delete(
+        `http://localhost:5000/api/v1/admin/rejectStudent/${_id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${jwtToken}`,
+          },
+        }
+      );
+
+      const updatedStudents = [...allStudents];
+      updatedStudents.splice(index, 1);
+
+      setAllStudents(updatedStudents);
+
+      toast.success("Student deleted successfully");
+    } catch (error) {
+      console.error("Error deleting student:", error);
+      toast.error("Error deleting student");
+    }
+  };
+
+  // ================= FORM =================
 
   const [formData, setFormData] = useState({
     name: "",
@@ -155,7 +204,7 @@ function Admin() {
         }
       );
 
-      fetchData();
+      fetchTeachers();
 
       setFormData({
         name: "",
@@ -179,7 +228,7 @@ function Admin() {
     }
   }
 
-  // ---------------- APPROVE / REJECT ----------------
+  // ================= APPROVE / REJECT =================
 
   const handleApproveReject = (_id) => {
     const updatedStudents = students.filter(
@@ -206,6 +255,8 @@ function Admin() {
       );
 
       setSpinner(false);
+
+      fetchAllStudents();
 
       toast.success("Student approved successfully");
     } catch (error) {
@@ -259,14 +310,14 @@ function Admin() {
 
             {/* ================= DASHBOARD CARDS ================= */}
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
 
-              {/* TEACHERS CARD */}
+              {/* TEACHERS */}
 
-              <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 hover:scale-[1.02] transition-all duration-300">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6">
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-slate-500 dark:text-slate-300 text-sm">
+                    <p className="text-slate-500 text-sm">
                       Total Teachers
                     </p>
 
@@ -282,18 +333,18 @@ function Admin() {
 
                 <button
                   onClick={() => setIsModalOpen(true)}
-                  className="mt-6 w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold transition-all"
+                  className="mt-6 w-full bg-indigo-600 hover:bg-indigo-700 text-white py-3 rounded-xl font-semibold"
                 >
                   Add Teacher
                 </button>
               </div>
 
-              {/* STUDENTS CARD */}
+              {/* PENDING STUDENTS */}
 
-              <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 hover:scale-[1.02] transition-all duration-300">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6">
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-slate-500 dark:text-slate-300 text-sm">
+                    <p className="text-slate-500 text-sm">
                       Pending Students
                     </p>
 
@@ -306,18 +357,34 @@ function Admin() {
                     <MdOutlineSchool />
                   </div>
                 </div>
+              </div>
 
-                <div className="mt-6 text-sm text-slate-500">
-                  Waiting for approval
+              {/* ALL STUDENTS */}
+
+              <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6">
+                <div className="flex justify-between items-center">
+                  <div>
+                    <p className="text-slate-500 text-sm">
+                      Total Students
+                    </p>
+
+                    <h2 className="text-4xl font-bold mt-2">
+                      {allStudents.length}
+                    </h2>
+                  </div>
+
+                  <div className="bg-blue-100 text-blue-600 p-4 rounded-full text-3xl">
+                    <FaUserGraduate />
+                  </div>
                 </div>
               </div>
 
-              {/* DEPARTMENTS CARD */}
+              {/* DEPARTMENTS */}
 
-              <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6 hover:scale-[1.02] transition-all duration-300">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-lg p-6">
                 <div className="flex justify-between items-center">
                   <div>
-                    <p className="text-slate-500 dark:text-slate-300 text-sm">
+                    <p className="text-slate-500 text-sm">
                       Departments
                     </p>
 
@@ -334,10 +401,6 @@ function Admin() {
                     <FaUniversity />
                   </div>
                 </div>
-
-                <div className="mt-6 text-sm text-slate-500">
-                  Active departments
-                </div>
               </div>
             </div>
 
@@ -353,10 +416,6 @@ function Admin() {
                       <h1 className="text-2xl font-bold">
                         Add New Teacher
                       </h1>
-
-                      <p className="text-slate-500 text-sm mt-1">
-                        Create teacher account
-                      </p>
                     </div>
 
                     <button
@@ -445,14 +504,14 @@ function Admin() {
                       <button
                         type="button"
                         onClick={() => setIsModalOpen(false)}
-                        className="px-6 py-3 rounded-xl bg-slate-300 hover:bg-slate-400 text-black font-semibold"
+                        className="px-6 py-3 rounded-xl bg-slate-300"
                       >
                         Cancel
                       </button>
 
                       <button
                         type="submit"
-                        className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white font-semibold"
+                        className="px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white"
                       >
                         Add Teacher
                       </button>
@@ -467,15 +526,9 @@ function Admin() {
             <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-lg p-6 mb-10 overflow-hidden">
 
               <div className="flex items-center justify-between mb-6">
-                <div>
-                  <h2 className="text-2xl font-bold">
-                    Teachers Management
-                  </h2>
-
-                  <p className="text-slate-500 mt-1">
-                    Manage all teachers
-                  </p>
-                </div>
+                <h2 className="text-2xl font-bold">
+                  Teachers Management
+                </h2>
 
                 <div className="bg-indigo-100 text-indigo-600 p-3 rounded-xl text-2xl">
                   <MdGroups />
@@ -498,11 +551,9 @@ function Admin() {
                     {teachers.map((teacher, index) => (
                       <tr
                         key={teacher._id}
-                        className="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all"
+                        className="border-b dark:border-slate-700"
                       >
-                        <td className="p-4 font-semibold">
-                          {index + 1}
-                        </td>
+                        <td className="p-4">{index + 1}</td>
 
                         <td className="p-4">
                           <div className="flex items-center gap-3">
@@ -523,7 +574,9 @@ function Admin() {
                         </td>
 
                         <td className="p-4">
-                          {teacher.subject.join(", ")}
+                          {Array.isArray(teacher.subject)
+                            ? teacher.subject.join(", ")
+                            : teacher.subject}
                         </td>
 
                         <td className="p-4">
@@ -535,13 +588,7 @@ function Admin() {
                             onClick={() =>
                               handleDeleteTeacher(teacher._id, index)
                             }
-                            disabled={
-                              teacher._id ===
-                                "6685a20d5be29facb5059f24" ||
-                              teacher._id ===
-                                "6685a7f197d78621a37725d8"
-                            }
-                            className="bg-red-500 hover:bg-red-600 text-white p-3 rounded-xl transition-all disabled:opacity-40"
+                            className="bg-red-500 hover:bg-red-600 text-white p-3 rounded-xl"
                           >
                             <MdDelete size={20} />
                           </button>
@@ -553,7 +600,89 @@ function Admin() {
               </div>
             </div>
 
-            {/* ================= STUDENTS ================= */}
+            {/* ================= ALL STUDENTS TABLE ================= */}
+
+            <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-lg p-6 mb-10 overflow-hidden">
+
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold">
+                  Student Management
+                </h2>
+
+                <div className="bg-blue-100 text-blue-600 p-3 rounded-xl text-2xl">
+                  <FaUserGraduate />
+                </div>
+              </div>
+
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-slate-100 dark:bg-slate-700">
+                      <th className="p-4">#</th>
+                      <th className="p-4">Student</th>
+                      <th className="p-4">Email</th>
+                      <th className="p-4">Department</th>
+                      <th className="p-4">Age</th>
+                      <th className="p-4 text-center">Action</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {allStudents.map((student, index) => (
+                      <tr
+                        key={student._id}
+                        className="border-b dark:border-slate-700"
+                      >
+                        <td className="p-4">{index + 1}</td>
+
+                        <td className="p-4">
+                          <div className="flex items-center gap-3">
+                            <div className="w-12 h-12 rounded-full bg-blue-500 text-white flex items-center justify-center font-bold">
+                              {student.name?.charAt(0)}
+                            </div>
+
+                            <div>
+                              <h3 className="font-semibold">
+                                {student.name}
+                              </h3>
+
+                              <p className="text-sm text-slate-500">
+                                Student
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+
+                        <td className="p-4">
+                          {student.email}
+                        </td>
+
+                        <td className="p-4">
+                          {student.department}
+                        </td>
+
+                        <td className="p-4">
+                          {student.age}
+                        </td>
+
+                        <td className="p-4 text-center">
+                          <button
+                            onClick={() =>
+                              handleDeleteStudent(student._id, index)
+                            }
+                            className="bg-red-500 hover:bg-red-600 text-white p-3 rounded-xl"
+                          >
+                            <MdDelete size={20} />
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            {/* ================= STUDENT REQUESTS ================= */}
 
             <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-lg p-6">
 
@@ -578,7 +707,7 @@ function Admin() {
                 {students.map((student) => (
                   <div
                     key={student._id}
-                    className="bg-slate-50 dark:bg-slate-700 rounded-2xl p-5 shadow-md hover:shadow-xl transition-all duration-300"
+                    className="bg-slate-50 dark:bg-slate-700 rounded-2xl p-5 shadow-md"
                   >
                     <div className="flex flex-col items-center text-center">
 
@@ -608,15 +737,7 @@ function Admin() {
                             handleApproveReject(student._id);
                             approveStudent(student._id);
                           }}
-                          disabled={
-                            student._id ===
-                              "66859c6ba5dda7d5bfe203e5" ||
-                            student._id ===
-                              "66859d38a5dda7d5bfe203ee" ||
-                            student._id ===
-                              "66859f7ef16ac328e1905491"
-                          }
-                          className="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-semibold transition-all disabled:opacity-40"
+                          className="flex-1 bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-semibold"
                         >
                           Approve
                         </button>
@@ -626,15 +747,7 @@ function Admin() {
                             handleApproveReject(student._id);
                             deleteStudent(student._id);
                           }}
-                          disabled={
-                            student._id ===
-                              "66859c6ba5dda7d5bfe203e5" ||
-                            student._id ===
-                              "66859d38a5dda7d5bfe203ee" ||
-                            student._id ===
-                              "66859f7ef16ac328e1905491"
-                          }
-                          className="flex-1 bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl font-semibold transition-all disabled:opacity-40"
+                          className="flex-1 bg-red-500 hover:bg-red-600 text-white py-3 rounded-xl font-semibold"
                         >
                           Reject
                         </button>

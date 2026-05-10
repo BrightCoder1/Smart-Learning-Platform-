@@ -169,3 +169,16 @@ exports.deleteStudent = catchAsync(async (req, res, next) => {
     message: "Student deleted",
   });
 });
+
+
+
+
+exports.getAllStudents = catchAsync(async (req, res, next) => {
+  const users = await User.find({ roles: "student" });
+  res.status(200).json({
+    status: "SUCCESS",
+    data: {
+      users,
+    }
+  })
+})

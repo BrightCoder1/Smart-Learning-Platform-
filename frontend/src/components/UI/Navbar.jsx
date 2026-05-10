@@ -14,28 +14,54 @@ const Navbar = () => {
 
   const isRootRoute = location.pathname === "/";
 
-  const localData =
-    localStorage.getItem("Teacher jwtToken") ||
-    localStorage.getItem("Student jwtToken") ||
-    localStorage.getItem("jwtToken");
+  // ================= TOKENS =================
 
-  const userData =
-    localStorage.getItem("Student Name") ||
-    localStorage.getItem("Teacher Name") ||
-    localStorage.getItem("Admin Name");
+  const teacherToken = localStorage.getItem("Teacher jwtToken");
+  const studentToken = localStorage.getItem("Student jwtToken");
+  const adminToken = localStorage.getItem("jwtToken");
+
+  const localData = teacherToken || studentToken || adminToken;
+
+  // ================= USER DATA =================
+
+  const teacherName = localStorage.getItem("Teacher Name");
+  const studentName = localStorage.getItem("Student Name");
+  const adminName = localStorage.getItem("Admin Name");
+
+  const userData = studentName || teacherName || adminName;
 
   const { theme, toggleTheme } = useContext(ThemeContext);
 
+  // ================= LOGOUT =================
+
   const changeHandler = () => {
-    localStorage.removeItem("Teacher jwtToken");
-    localStorage.removeItem("Student jwtToken");
-    localStorage.removeItem("jwtToken");
 
-    localStorage.removeItem("Student Name");
-    localStorage.removeItem("Teacher Name");
-    localStorage.removeItem("Admin Name");
+    // Teacher Logout
+    if (teacherToken) {
 
-    toast.success("Logout Successfully");
+      localStorage.removeItem("Teacher jwtToken");
+      localStorage.removeItem("Teacher Name");
+
+      toast.success("Teacher Logout Successfully");
+    }
+
+    // Student Logout
+    else if (studentToken) {
+
+      localStorage.removeItem("Student jwtToken");
+      localStorage.removeItem("Student Name");
+
+      toast.success("Student Logout Successfully");
+    }
+
+    // Admin Logout
+    else if (adminToken) {
+
+      localStorage.removeItem("jwtToken");
+      localStorage.removeItem("Admin Name");
+
+      toast.success("Admin Logout Successfully");
+    }
 
     navigate("/");
   };
@@ -43,9 +69,13 @@ const Navbar = () => {
   return (
     <>
       <nav className="sticky top-0 z-50 backdrop-blur-lg bg-white/80 dark:bg-slate-950/80 border-b border-gray-200 dark:border-slate-800 shadow-md">
+
         <div className="max-w-7xl mx-auto px-4 lg:px-8">
+
           <div className="flex items-center justify-between h-20">
-            {/* Logo */}
+
+            {/* ================= LOGO ================= */}
+
             <Link
               to={!localData ? "/" : undefined}
               onClick={() => {
@@ -56,10 +86,12 @@ const Navbar = () => {
               className="flex items-center gap-3"
             >
               <div className="bg-gradient-to-r from-indigo-600 to-blue-600 p-3 rounded-2xl shadow-lg">
+
                 <HiOutlineAcademicCap className="text-white text-2xl" />
               </div>
 
               <div className="flex flex-col">
+
                 <h1 className="text-2xl font-extrabold bg-gradient-to-r from-indigo-600 to-blue-600 bg-clip-text text-transparent">
                   Tutor-Time
                 </h1>
@@ -70,14 +102,19 @@ const Navbar = () => {
               </div>
             </Link>
 
-            {/* Right Section */}
+            {/* ================= RIGHT SECTION ================= */}
+
             <div className="flex items-center gap-4">
-              {/* User Info */}
+
+              {/* ================= USER INFO ================= */}
+
               {userData && (
                 <div className="hidden sm:flex items-center gap-3 bg-gray-100 dark:bg-slate-900 px-4 py-2 rounded-2xl shadow-sm">
+
                   <FaUserCircle className="text-2xl text-indigo-600" />
 
                   <div className="flex flex-col">
+
                     <span className="text-xs text-gray-500 dark:text-gray-400">
                       Welcome Back
                     </span>
@@ -89,7 +126,8 @@ const Navbar = () => {
                 </div>
               )}
 
-              {/* Theme Button */}
+              {/* ================= THEME BUTTON ================= */}
+
               <button
                 onClick={toggleTheme}
                 className="w-12 h-12 rounded-2xl flex items-center justify-center bg-gray-100 dark:bg-slate-900 hover:scale-105 transition-all duration-300 shadow-md"
@@ -101,12 +139,14 @@ const Navbar = () => {
                 )}
               </button>
 
-              {/* Logout Button */}
+              {/* ================= LOGOUT BUTTON ================= */}
+
               {localData && (
                 <button
                   onClick={changeHandler}
                   className="flex items-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white font-semibold shadow-lg transition-all duration-300 hover:scale-105"
                 >
+
                   <IoIosLogOut className="text-2xl" />
 
                   <span className="hidden md:block">
