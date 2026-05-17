@@ -15,6 +15,8 @@ import NotFound from "./Pages/NotFound";
 import TodayDate from "./components/UI/TodayDate";
 import Spinner from "./components/UI/Spinner";
 import "./App.css"
+import Attendance from "./components/Attendance";
+import StudentData from "./components/StudentData";
 
 function App() {
   return (
@@ -22,14 +24,16 @@ function App() {
       <BrowserRouter>
         <Navbar />
 
-        <TodayDate />
+        {/* <TodayDate /> */}
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/student/login" element={<Studentlogin />} />
+          <Route path="/attendance" element={<Attendance />} />
           <Route path="/student/signup" element={<Studentsignup />} />
           <Route path="/teacher/login" element={<Teacherlogin />} />
           <Route path="/teacher/dashboard" element={<TeacherDashboard />} />
           <Route path="/student/dashboard" element={<StudentDashboard />} />
+          <Route path="/students/get" element={<StudentData />} />
           <Route path="/student/notapproved" element={<ApproveStudent />} />
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/login" element={<AdminLogin />} />

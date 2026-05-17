@@ -11,8 +11,9 @@ const verifyPassword = async (candidatePassword, userPassword) => {
 };
 
 const signToken = async (id, role, name ,email,admissionStatus) => {
-  return await jwt.sign({ id, role, name,email,admissionStatus }, process.env.JWT_KEY, {
-    expiresIn: '90d'
+  const expiresIn = process.env.JWT_EXPIRES_IN || '24h';
+  return await jwt.sign({ id, role, name, email, admissionStatus }, process.env.JWT_KEY, {
+    expiresIn,
   });
 };
 

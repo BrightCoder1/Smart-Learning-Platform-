@@ -13,6 +13,7 @@ import {
   FaClock,
   FaBookOpen,
   FaUserGraduate,
+  FaUserCheck
 } from "react-icons/fa";
 
 function Student() {
@@ -282,6 +283,23 @@ function Student() {
                   Student Account
                 </p>
               </div>
+
+              <div
+                onClick={() => navigate("/attendance")}
+                className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-xl sm:col-span-2 xl:col-span-1 cursor-pointer hover:scale-105 hover:shadow-2xl transition-all duration-300"
+              >
+
+                <FaUserCheck className="text-4xl sm:text-5xl text-yellow-700 mb-4" />
+
+                <h2 className="text-3xl sm:text-4xl font-bold">
+                  Attendance
+                </h2>
+
+                <p className="mt-2 text-base sm:text-lg text-gray-500">
+                  Check %
+                </p>
+              </div>
+
             </div>
 
             {/* ================= LECTURES ================= */}

@@ -329,11 +329,10 @@ function Teacher() {
                         onClick={() =>
                           handleTimeSlotSelect(slot.value)
                         }
-                        className={`p-4 rounded-2xl border font-semibold transition-all duration-300 ${
-                          highlightedTimeSlot === slot.value
-                            ? "bg-indigo-600 text-white scale-105 shadow-lg"
-                            : "bg-gray-100 hover:bg-indigo-100 dark:bg-slate-800"
-                        }`}
+                        className={`p-4 rounded-2xl border font-semibold transition-all duration-300 ${highlightedTimeSlot === slot.value
+                          ? "bg-indigo-600 text-white scale-105 shadow-lg"
+                          : "bg-gray-100 hover:bg-indigo-100 dark:bg-slate-800"
+                          }`}
                       >
                         {slot.label}
                       </button>
@@ -434,6 +433,23 @@ function Teacher() {
                   Total Messages
                 </p>
               </div>
+            </div>
+
+            <div
+              onClick={() => navigate("/students/get")}
+              className="bg-white dark:bg-slate-900 rounded-3xl p-8 shadow-xl mb-4 cursor-pointer transition-all duration-300"
+            >
+              <FaUserGraduate className="text-4xl text-indigo-600 mb-4" />
+
+              <h2 className="text-3xl font-bold">
+                Your Student
+              </h2>
+
+              <p className="text-lg mt-2 text-gray-500 flex items-center gap-2">
+                View Students
+                <BsChevronRight />
+              </p>
+
             </div>
 
             {/* Appointment Table */}

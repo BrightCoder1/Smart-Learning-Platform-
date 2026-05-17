@@ -30,11 +30,6 @@ const appointmentSchema = new mongoose.Schema({
             }
         }
     ]
-
-
-
-
-
 })
 
 appointmentSchema.index({ sendBy: 1, scheduleAt: 1 }, { unique: true });
