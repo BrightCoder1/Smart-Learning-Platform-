@@ -17,6 +17,8 @@ import Spinner from "./components/UI/Spinner";
 import "./App.css"
 import Attendance from "./components/Attendance";
 import StudentData from "./components/StudentData";
+import StudentAttendance from "./components/StudentAttendance";
+import TeacherAttendance from "./components/TeacherAttendance";
 
 function App() {
   return (
@@ -38,6 +40,14 @@ function App() {
           <Route path="/admin/dashboard" element={<AdminDashboard />} />
           <Route path="/admin/login" element={<AdminLogin />} />
           <Route path="/spinner" element={<Spinner />} />
+          <Route
+            path="/teacher/student-attendance/:id"
+            element={<StudentAttendance />}
+          />
+          <Route
+            path="/teacher/attendance"
+            element={<TeacherAttendance />}
+          />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </BrowserRouter>

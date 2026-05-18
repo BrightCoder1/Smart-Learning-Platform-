@@ -4,6 +4,7 @@ const express = require('express')
 const { createAppointment, deleteAppointment, getAllAppointments, getAllStudents, approveAppointment, dissapproveAppointment, getAllPendingStudents } = require("../controllers/teacherController")
 const router = express.Router()
 const User = require("../models/User")
+const Attendance = require("../models/Attendance")
 
 router.route('/').get(getAllStudents);
 router.post('/login', login)
@@ -77,6 +78,319 @@ router.delete(
         }
     }
 );
+
+router.patch(
+    "/students/update/:id",
+
+    verifyToken,
+
+    allow("admin", "teacher"),
+
+    async (req, res) => {
+
+        try {
+
+            const {
+                name,
+                email,
+                department,
+                age,
+                roles,
+                password,
+                passwordConfirm,
+            } = req.body;
+
+            // ================= FIND STUDENT =================
+
+            const student = await User.findById(
+                req.params.id
+            );
+
+            if (!student) {
+
+                return res.status(404).json({
+                    status: "fail",
+                    message: "Student not found",
+                });
+            }
+
+            // ================= UPDATE NORMAL FIELDS =================
+
+            student.name =
+                name || student.name;
+
+            student.email =
+                email || student.email;
+
+            student.department =
+                department || student.department;
+
+            student.age =
+                age || student.age;
+
+            // ================= ONLY ADMIN CAN CHANGE ROLE =================
+
+            if (
+                req.user.roles === "admin" &&
+                roles
+            ) {
+                student.roles = roles;
+            }
+
+            // ================= PASSWORD UPDATE =================
+
+            if (password) {
+
+                if (
+                    password !== passwordConfirm
+                ) {
+
+                    return res.status(400).json({
+                        status: "fail",
+                        message:
+                            "Password and Confirm Password do not match",
+                    });
+                }
+
+                student.password = password;
+
+                student.passwordConfirm =
+                    passwordConfirm;
+            }
+
+            // ================= SAVE =================
+
+            await student.save();
+
+            res.status(200).json({
+                status: "success",
+                message:
+                    "Student updated successfully",
+                student,
+            });
+
+        } catch (error) {
+
+            console.log(error);
+
+            res.status(500).json({
+                status: "fail",
+                message: error.message,
+            });
+        }
+    }
+);
+
+
+
+router.get(
+    "/students/attendance/:studentId",
+
+    verifyToken,
+
+    allow("teacher", "admin"),
+
+    async (req, res) => {
+
+        try {
+
+            const { studentId } = req.params;
+
+            const student = await User.findById(studentId)
+                .populate("attendance");
+
+            if (!student) {
+
+                return res.status(404).json({
+                    status: "fail",
+                    message: "Student not found",
+                });
+            }
+
+            res.status(200).json({
+
+                status: "success",
+
+                attendance: student.attendance,
+            });
+
+        } catch (error) {
+
+            console.log(error);
+
+            res.status(500).json({
+
+                status: "error",
+
+                message: error.message,
+            });
+        }
+    }
+);
+
+
+router.post(
+    "/students/attendance/:studentId",
+
+    verifyToken,
+
+    allow("teacher", "admin"),
+
+    async (req, res) => {
+
+        try {
+
+            const { studentId } = req.params;
+
+            const {
+                lectureName,
+                subject,
+                status,
+                date,
+            } = req.body;
+
+            // ================= VALIDATION =================
+
+            if (
+                !lectureName ||
+                !subject ||
+                !status
+            ) {
+
+                return res.status(400).json({
+                    status: "fail",
+                    message: "Please fill all fields",
+                });
+            }
+
+            // ================= FIND STUDENT =================
+
+            const student = await User.findById(studentId);
+
+            if (!student) {
+
+                return res.status(404).json({
+                    status: "fail",
+                    message: "Student not found",
+                });
+            }
+
+            // ================= CREATE ATTENDANCE =================
+
+            const attendance = await Attendance.create({
+
+                student: studentId,
+
+                lectureName,
+
+                subject,
+
+                status,
+
+                date: date || new Date(),
+            });
+
+            // ================= UPDATE USER =================
+
+            await User.findByIdAndUpdate(
+                studentId,
+                {
+                    $push: {
+                        attendance: attendance._id,
+                    },
+                }
+            );
+
+            // ================= RESPONSE =================
+
+            res.status(201).json({
+
+                status: "success",
+
+                message:
+                    "Attendance submitted successfully",
+
+                attendance,
+            });
+
+        } catch (error) {
+
+            console.log(error);
+
+            res.status(500).json({
+
+                status: "error",
+
+                message: error.message,
+            });
+        }
+    }
+);
+
+
+// ================= GET PARTICULAR STUDENT WITH ATTENDANCE =================
+// ROUTE:
+// GET http://localhost:5000/api/v1/teachers/students/get/:id
+
+router.get(
+    "/students/get/:id",
+
+    verifyToken,
+
+    allow("admin", "teacher"),
+
+    async (req, res) => {
+
+        try {
+
+            const student = await User.findById(
+                req.params.id
+            )
+
+                .populate({
+                    path: "attendance",
+                    options: {
+                        sort: { date: -1 }
+                    }
+                })
+
+                .select(
+                    "-password -passwordConfirm"
+                );
+
+            // ================= CHECK STUDENT =================
+
+            if (!student) {
+
+                return res.status(404).json({
+                    status: "fail",
+                    message: "Student not found",
+                });
+            }
+
+            // ================= RESPONSE =================
+
+            res.status(200).json({
+
+                status: "success",
+
+                student,
+            });
+
+        } catch (error) {
+
+            console.log(error);
+
+            res.status(500).json({
+
+                status: "error",
+
+                message: error.message,
+            });
+        }
+    }
+);
+
 
 
 module.exports = router

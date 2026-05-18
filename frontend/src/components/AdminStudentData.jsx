@@ -10,18 +10,15 @@ import {
   FaArrowRight,
   FaUserGraduate,
   FaTimes,
-  FaClipboardCheck,
 } from "react-icons/fa";
 
-function StudentData() {
+function AdminStudentData() {
 
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(false);
 
   const [currentPage, setCurrentPage] =
     useState(1);
-
-  // VIEW MODAL
 
   const [showProfile, setShowProfile] =
     useState(false);
@@ -166,13 +163,9 @@ function StudentData() {
         )
       );
 
-      alert("Student deleted successfully");
-
     } catch (error) {
 
       console.log(error);
-
-      alert("Delete failed");
     }
   };
 
@@ -223,44 +216,14 @@ function StudentData() {
 
     try {
 
-      if (
-        formData.password &&
-        formData.password !==
-          formData.passwordConfirm
-      ) {
-
-        return alert(
-          "Passwords do not match"
-        );
-      }
-
       const jwtToken = localStorage.getItem(
         "Teacher jwtToken"
       );
 
-      const payload = {
-        name: formData.name,
-        email: formData.email,
-        department:
-          formData.department,
-        age: formData.age,
-      };
-
-      // SEND PASSWORD ONLY IF FILLED
-
-      if (formData.password) {
-
-        payload.password =
-          formData.password;
-
-        payload.passwordConfirm =
-          formData.passwordConfirm;
-      }
-
       const response = await axios.patch(
         `http://localhost:5000/api/v1/teachers/students/update/${selectedStudent._id}`,
 
-        payload,
+        formData,
 
         {
           headers: {
@@ -276,8 +239,7 @@ function StudentData() {
 
       setStudents((prev) =>
         prev.map((student) =>
-          student._id ===
-          updatedStudent._id
+          student._id === updatedStudent._id
             ? updatedStudent
             : student
         )
@@ -297,7 +259,7 @@ function StudentData() {
 
       alert(
         error.response?.data?.message ||
-          "Update failed"
+        "Update failed"
       );
     }
   };
@@ -555,7 +517,6 @@ function StudentData() {
         </div>
 
         <div>
-
           <h1 className="text-3xl font-bold dark:text-white">
             Students Database
           </h1>
@@ -563,7 +524,6 @@ function StudentData() {
           <p className="text-gray-500 dark:text-gray-400">
             Manage students records and details
           </p>
-
         </div>
       </div>
 
@@ -665,19 +625,6 @@ function StudentData() {
                           <FaEye />
                         </button>
 
-                        {/* ATTENDANCE */}
-
-                        <button
-                          onClick={() =>
-                            navigate(
-                              `/teacher/student-attendance/${student._id}`
-                            )
-                          }
-                          className="text-gray-500 hover:text-yellow-500 transition-all"
-                        >
-                          <FaClipboardCheck />
-                        </button>
-
                         {/* EDIT */}
 
                         <button
@@ -704,6 +651,7 @@ function StudentData() {
 
                       </div>
                     </td>
+
                   </tr>
                 )
               )
@@ -722,69 +670,9 @@ function StudentData() {
             )}
           </tbody>
         </table>
-
-        {/* ================= PAGINATION ================= */}
-
-        <div className="flex items-center justify-between p-5 border-t border-gray-200 dark:border-slate-800">
-
-          <button
-            onClick={handlePrev}
-            disabled={currentPage === 1}
-            className={`flex items-center gap-2 px-5 py-2 rounded-xl transition-all ${
-              currentPage === 1
-                ? "bg-gray-300 dark:bg-slate-700 cursor-not-allowed"
-                : "bg-white dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 text-black dark:text-white"
-            }`}
-          >
-            <FaArrowLeft />
-            Previous
-          </button>
-
-          <div className="flex gap-2">
-
-            {[...Array(totalPages)].map(
-              (_, index) => (
-
-                <button
-                  key={index}
-                  onClick={() =>
-                    setCurrentPage(
-                      index + 1
-                    )
-                  }
-                  className={`w-10 h-10 rounded-xl font-semibold transition-all ${
-                    currentPage ===
-                    index + 1
-                      ? "bg-black dark:bg-indigo-600 text-white"
-                      : "bg-gray-200 dark:bg-slate-800 hover:bg-gray-300 dark:hover:bg-slate-700 text-black dark:text-white"
-                  }`}
-                >
-                  {index + 1}
-                </button>
-              )
-            )}
-
-          </div>
-
-          <button
-            onClick={handleNext}
-            disabled={
-              currentPage === totalPages
-            }
-            className={`flex items-center gap-2 px-5 py-2 rounded-xl transition-all ${
-              currentPage === totalPages
-                ? "bg-gray-300 dark:bg-slate-700 cursor-not-allowed"
-                : "bg-white dark:bg-slate-800 hover:bg-gray-100 dark:hover:bg-slate-700 text-black dark:text-white"
-            }`}
-          >
-            Next
-            <FaArrowRight />
-          </button>
-
-        </div>
       </div>
     </div>
   );
 }
 
-export default StudentData;
+export default AdminStudentData;
