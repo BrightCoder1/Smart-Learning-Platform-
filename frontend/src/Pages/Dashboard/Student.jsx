@@ -285,7 +285,7 @@ function Student() {
               </div>
 
               <div
-                onClick={() => navigate("/attendance")}
+                onClick={() => navigate(`/attendance/${teachers._id}`)}
                 className="bg-white dark:bg-slate-900 rounded-3xl p-6 sm:p-8 shadow-xl sm:col-span-2 xl:col-span-1 cursor-pointer hover:scale-105 hover:shadow-2xl transition-all duration-300"
               >
 

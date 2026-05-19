@@ -15,6 +15,7 @@ import {
   FaUniversity,
   FaEnvelope,
   FaUserGraduate,
+  FaCheckCircle,
 } from "react-icons/fa";
 
 import Header from "../../components/Header";
@@ -401,9 +402,28 @@ function Admin() {
                   </div>
                 </div>
               </div>
+
+              <div
+                onClick={() =>
+                  navigate(
+                    "/teacher/attendance"
+                  )
+                }
+                className="bg-gradient-to-r from-green-500 to-emerald-600 text-white rounded-3xl p-8 shadow-xl cursor-pointer hover:scale-105 transition"
+              >
+
+                <FaCheckCircle className="text-4xl mb-4" />
+
+                <h2 className="text-3xl font-bold">
+                  Attendance
+                </h2>
+
+                <p className="text-lg mt-2">
+                  Manage Student Attendance
+                </p>
+              </div>
             </div>
 
-            {/* ================= MODAL ================= */}
 
             {isModalOpen && (
               <div className="fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center items-center z-50 p-4">

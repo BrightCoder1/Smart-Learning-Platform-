@@ -134,7 +134,7 @@ function StudentAttendance() {
 
       alert(
         error.response?.data?.message ||
-          "Attendance failed"
+        "Attendance failed"
       );
     }
   };
@@ -379,12 +379,11 @@ function StudentAttendance() {
                     <td className="p-4">
 
                       <span
-                        className={`px-4 py-1 rounded-full text-sm font-semibold ${
-                          item.status ===
-                          "Present"
+                        className={`px-4 py-1 rounded-full text-sm font-semibold ${item.status ===
+                            "Present"
                             ? "bg-green-100 text-green-600"
                             : "bg-red-100 text-red-600"
-                        }`}
+                          }`}
                       >
                         {item.status}
                       </span>
